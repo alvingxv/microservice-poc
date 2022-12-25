@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Controller, Inject, Post } from '@nestjs/common';
+import { Controller, Inject, Post, UseGuards } from '@nestjs/common';
 import {
   AUTH_SERVICE_NAME,
   AuthServiceClient,
@@ -10,6 +10,9 @@ import {
   LoginRequest,
 } from './auth.pb';
 import { Body } from '@nestjs/common/decorators';
+import { HasRoles } from './roles.decorator';
+import { Role } from './role.enum';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -34,5 +37,12 @@ export class AuthController {
     @Body() body: LoginRequest,
   ): Promise<Observable<LoginResponse>> {
     return this.svc.login(body);
+  }
+
+  @HasRoles(Role.Admin)
+  @UseGuards(AuthGuard)
+  @Post('test')
+  test(): string {
+    return 'masuk';
   }
 }
