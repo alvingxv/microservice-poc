@@ -13,7 +13,9 @@ export class JwtService {
   constructor(private readonly jwt: Jwt) {}
 
   public async validateUser(decoded: any): Promise<User> {
-    return this.repository.findOne(decoded.id);
+    return this.repository.findOne({
+      where: { id: decoded.jid },
+    });
   }
 
   //decode jwt
@@ -23,7 +25,7 @@ export class JwtService {
 
   //generate jwt
   public generateToken(user: User): string {
-    return this.jwt.sign({ id: user.id, email: user.email });
+    return this.jwt.sign({ id: user.id, email: user.email, role: user.role });
   }
 
   //generate hashed password

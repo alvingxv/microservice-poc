@@ -6,7 +6,11 @@ import {
 } from './../auth.dto';
 import { JwtService } from './jwt.service';
 import { InjectRepository } from '@nestjs/typeorm/dist';
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { User } from '../user.entity';
 import { Repository } from 'typeorm';
 import { LoginResponse, RegisterResponse, ValidateResponse } from '../auth.pb';
@@ -34,7 +38,11 @@ export class AuthService {
 
     try {
       await this.repository.save(user);
-    } catch {}
+
+      return { status: HttpStatus.CREATED, error: [''] };
+    } catch (err) {
+      throw new InternalServerErrorException();
+    }
   }
 
   public async login({
@@ -43,12 +51,20 @@ export class AuthService {
   }: LoginRequestDto): Promise<LoginResponse> {
     const user: User = await this.repository.findOne({ where: { email } });
 
+    if (!user) {
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        error: ['invalid email/password'],
+        token: null,
+      };
+    }
+
     const isPasswordValid: boolean = this.jwtService.isValidPassword(
       password,
       user.password,
     );
 
-    if (!user || !isPasswordValid) {
+    if (!isPasswordValid) {
       return {
         status: HttpStatus.BAD_REQUEST,
         error: ['invalid email/password'],
@@ -73,5 +89,23 @@ export class AuthService {
         userRole: decoded.role,
       };
     }
+
+    const user: User = await this.jwtService.validateUser(decoded);
+
+    if (!user) {
+      return {
+        status: HttpStatus.CONFLICT,
+        error: ['User not found'],
+        userId: null,
+        userRole: null,
+      };
+    }
+
+    return {
+      status: HttpStatus.OK,
+      error: null,
+      userId: decoded.id,
+      userRole: decoded.role,
+    };
   }
 }
