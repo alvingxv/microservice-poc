@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
         name: AUTH_SERVICE_NAME,
         transport: Transport.GRPC,
         options: {
-          url: '0.0.0.0:50021',
+          url: '0.0.0.0:50051',
           package: AUTH_PACKAGE_NAME,
           protoPath: '../grpc-proto/proto/auth.proto',
         },

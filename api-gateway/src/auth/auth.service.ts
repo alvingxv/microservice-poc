@@ -19,6 +19,6 @@ export class AuthService {
   }
 
   public async validate(token: string): Promise<ValidateResponse> {
-    return firstValueFrom(this.svc.validate({ token }));
+    return await firstValueFrom(this.svc.validate({ token }));
   }
 }

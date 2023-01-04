@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Controller, Inject, Post, UseGuards } from '@nestjs/common';
+import { Controller, Inject, Post, UseGuards, Body, Get } from '@nestjs/common';
 import {
   AUTH_SERVICE_NAME,
   AuthServiceClient,
@@ -9,10 +9,11 @@ import {
   LoginResponse,
   LoginRequest,
 } from './auth.pb';
-import { Body } from '@nestjs/common/decorators';
 import { HasRoles } from './roles.decorator';
 import { Role } from './role.enum';
 import { AuthGuard } from './auth.guard';
+import { Req } from '@nestjs/common/decorators';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -41,8 +42,9 @@ export class AuthController {
 
   @HasRoles(Role.Admin)
   @UseGuards(AuthGuard)
-  @Post('test')
-  test(): string {
+  @Get('test')
+  test(@Req() req: Request): string {
+    console.log(req.body);
     return 'masuk';
   }
 }

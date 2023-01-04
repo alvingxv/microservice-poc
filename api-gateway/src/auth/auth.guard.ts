@@ -33,11 +33,12 @@ export class AuthGuard implements CanActivate {
 
     const bearer: string[] = authorization.split(' ');
 
-    if (bearer || bearer.length < 2) {
+    if (!bearer || bearer.length < 2) {
       throw new UnauthorizedException();
     }
 
     const token: string = bearer[1];
+
     const { status, userId, userRole }: ValidateResponse =
       await this.service.validate(token);
 
