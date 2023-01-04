@@ -1,7 +1,7 @@
 import {
-  ArgumentsHost,
-  Catch,
   ExceptionFilter,
+  Catch,
+  ArgumentsHost,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -18,6 +18,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (status === HttpStatus.BAD_REQUEST) {
       const res: any = exception.getResponse();
+
       return { status, error: res.message };
     }
 
